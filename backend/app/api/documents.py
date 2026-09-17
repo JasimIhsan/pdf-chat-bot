@@ -106,8 +106,11 @@ async def upload_document(file: UploadFile = File(...)):
 
 
 	return {
+		"status": "success",
+		"doc_id": doc_id,
 		"filename": file.filename,
 		"total_pages": len(reader.pages),
+		"total_chunks": len(chunks),
 		"file_size_bytes": len(contents),
-		"charecter_count": len(extracted_text),
-		}
+		"character_count": len(extracted_text),
+	}
