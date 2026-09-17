@@ -257,8 +257,8 @@ export default function WorkspacePage() {
          {/* Top Navbar matching Home page */}
          <Navbar />
 
-         {/* Main Workspace Container with standard side padding matching home */}
-         <div className="container mx-auto px-4 md:px-8 max-w-screen-2xl flex-1 flex min-h-0 py-3 md:py-4 gap-3 md:gap-3.5 overflow-hidden">
+         {/* Main Workspace Container with responsive padding and heights */}
+         <div className="container mx-auto px-2 sm:px-4 md:px-8 max-w-screen-2xl flex-1 flex min-h-0 py-2 sm:py-3 md:py-4 gap-2 sm:gap-3 md:gap-3.5 overflow-hidden">
             {/* Hidden File Input */}
             <input type="file" ref={fileInputRef} className="hidden" accept="application/pdf" onChange={(e) => e.target.files?.[0] && handleFileSelect(e.target.files[0])} />
 

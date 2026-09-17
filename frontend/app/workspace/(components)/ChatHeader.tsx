@@ -17,7 +17,7 @@ export function ChatHeader({ isSidebarOpen, setIsSidebarOpen, onClearChat, mobil
    return (
       <header className="h-14 border-b border-border/70 dark:border-white/10 flex items-center justify-between px-3.5 sm:px-5 bg-card/60 dark:bg-zinc-950/40 backdrop-blur z-10 shrink-0">
          {/* Left Controls: Desktop Sidebar Toggle & Mobile View Switcher */}
-         <div className="flex items-center gap-2 sm:gap-2.5">
+         <div className="flex items-center gap-1.5 sm:gap-2.5 min-w-0">
             {/* Desktop Sidebar Toggle */}
             <div className="hidden md:flex items-center gap-2.5">
                <Tooltip content={isSidebarOpen ? "Collapse document panel" : "Open document panel"} side="bottom">
@@ -39,13 +39,13 @@ export function ChatHeader({ isSidebarOpen, setIsSidebarOpen, onClearChat, mobil
             {/* Mobile View Switcher */}
             {setMobileView && (
                <div className="flex md:hidden items-center bg-muted/50 p-0.5 rounded-lg border border-border/60">
-                  <button onClick={() => setMobileView("document")} className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium transition-all ${mobileView === "document" ? "bg-card text-foreground shadow-2xs border border-border/50" : "text-muted-foreground hover:text-foreground"}`}>
-                     <FileText className="h-3.5 w-3.5" />
-                     <span>{fileState?.file ? "Document" : "Upload"}</span>
+                  <button onClick={() => setMobileView("document")} className={`flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium transition-all ${mobileView === "document" ? "bg-card text-foreground shadow-2xs border border-border/50" : "text-muted-foreground hover:text-foreground"}`}>
+                     <FileText className="h-3 w-3" />
+                     <span>Doc</span>
                      {fileState?.status === "complete" && <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />}
                   </button>
-                  <button onClick={() => setMobileView("chat")} className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium transition-all ${mobileView === "chat" ? "bg-card text-foreground shadow-2xs border border-border/50" : "text-muted-foreground hover:text-foreground"}`}>
-                     <MessageSquare className="h-3.5 w-3.5" />
+                  <button onClick={() => setMobileView("chat")} className={`flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium transition-all ${mobileView === "chat" ? "bg-card text-foreground shadow-2xs border border-border/50" : "text-muted-foreground hover:text-foreground"}`}>
+                     <MessageSquare className="h-3 w-3" />
                      <span>Chat</span>
                   </button>
                </div>
@@ -53,10 +53,10 @@ export function ChatHeader({ isSidebarOpen, setIsSidebarOpen, onClearChat, mobil
          </div>
 
          {/* Right Controls */}
-         <div className="flex items-center space-x-1 sm:space-x-1.5">
+         <div className="flex items-center space-x-1 sm:space-x-1.5 shrink-0">
             <Tooltip content="Clear conversation" side="bottom">
-               <button onClick={onClearChat} className="h-8 w-8 flex justify-center items-center rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground transition-colors">
-                  <Trash className="h-4 w-4" />
+               <button onClick={onClearChat} className="h-7 w-7 sm:h-8 sm:w-8 flex justify-center items-center rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground transition-colors" title="Clear conversation">
+                  <Trash className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                </button>
             </Tooltip>
          </div>

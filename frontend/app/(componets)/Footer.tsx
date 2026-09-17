@@ -11,7 +11,7 @@ export function Footer() {
          <div className="h-px w-full bg-linear-to-r from-transparent via-white/15 to-transparent" />
 
          <div className="bg-zinc-950/70 backdrop-blur-2xl py-8 md:py-10">
-            <div className="container mx-auto px-4 md:px-8 max-w-screen-2xl">
+            <div className="container mx-auto px-4 sm:px-6 md:px-8 max-w-screen-2xl">
                <div className="flex flex-col md:flex-row items-center justify-between gap-6 pb-6 border-b border-white/5">
                   {/* Brand & Status */}
                   <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4 text-center sm:text-left">
@@ -29,7 +29,7 @@ export function Footer() {
                   </div>
 
                   {/* Quick Action Links & GitHub */}
-                  <div className="flex items-center gap-4 sm:gap-6 text-xs text-muted-foreground">
+                  <div className="flex flex-wrap items-center justify-center sm:justify-end gap-4 sm:gap-6 text-xs text-muted-foreground">
                      <Link href="/workspace" className="inline-flex items-center gap-1 hover:text-foreground transition-colors font-medium">
                         <Sparkles className="h-3.5 w-3.5 text-primary" />
                         <span>Open Workspace</span>
@@ -40,6 +40,9 @@ export function Footer() {
                      </Link>
                      <Link href="/#architecture" className="hover:text-foreground transition-colors">
                         Architecture
+                     </Link>
+                     <Link href="/#faq" className="hover:text-foreground transition-colors">
+                        FAQ
                      </Link>
                      <Link href="https://github.com" target="_blank" rel="noreferrer" className="h-8 w-8 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors" title="GitHub Repository">
                         <span className="sr-only">GitHub</span>
@@ -52,7 +55,7 @@ export function Footer() {
                </div>
 
                {/* Copyright & Engine Tag */}
-               <div className="pt-5 flex flex-col sm:flex-row items-center justify-between gap-3 text-[11px] text-zinc-500">
+               <div className="pt-5 flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left text-[11px] text-zinc-500">
                   <p>© {new Date().getFullYear()} PDFChat. Open-source intelligent document interrogation.</p>
                   <p className="font-mono">Architecture: Semantic RAG Pipeline • High-Dimensional Vector Search</p>
                </div>
