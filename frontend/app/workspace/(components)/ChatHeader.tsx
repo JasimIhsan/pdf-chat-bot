@@ -15,7 +15,7 @@ interface ChatHeaderProps {
 
 export function ChatHeader({ isSidebarOpen, setIsSidebarOpen, onClearChat, mobileView, setMobileView, fileState }: ChatHeaderProps) {
    return (
-      <header className="h-14 border-b border-border/70 flex items-center justify-between px-3.5 sm:px-5 bg-card/60 backdrop-blur z-10 shrink-0">
+      <header className="h-14 border-b border-border/70 dark:border-white/10 flex items-center justify-between px-3.5 sm:px-5 bg-card/60 dark:bg-zinc-950/40 backdrop-blur z-10 shrink-0">
          {/* Left Controls: Desktop Sidebar Toggle & Mobile View Switcher */}
          <div className="flex items-center gap-2 sm:gap-2.5">
             {/* Desktop Sidebar Toggle */}

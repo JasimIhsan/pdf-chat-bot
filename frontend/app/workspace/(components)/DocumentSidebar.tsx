@@ -28,11 +28,11 @@ export function DocumentSidebar({ isOpen, onClose, fileState, activeTab, setActi
          className={`
             ${mobileView === "document" ? "flex w-full" : "hidden"}
             ${isOpen ? "md:flex md:w-1/2 lg:w-[48%] xl:w-[45%]" : "md:hidden"}
-            h-full border border-border/80 bg-card rounded-2xl flex-col shadow-sm overflow-hidden shrink-0 transition-all duration-300
+            h-full border border-border/80 dark:border-white/10 bg-card/70 dark:bg-zinc-950/50 backdrop-blur-xl rounded-2xl flex-col shadow-sm overflow-hidden shrink-0 transition-all duration-300
          `}
       >
          {/* Left Header */}
-         <div className="h-14 px-3.5 sm:px-5 border-b border-border/70 flex justify-between items-center bg-card/60 backdrop-blur shrink-0">
+         <div className="h-14 px-3.5 sm:px-5 border-b border-border/70 dark:border-white/10 flex justify-between items-center bg-card/60 dark:bg-zinc-950/40 backdrop-blur shrink-0">
             <div className="flex items-center gap-2 sm:gap-2.5 min-w-0">
                <div className="h-8 w-8 bg-primary/10 rounded-lg flex items-center justify-center shrink-0 border border-primary/20">
                   <FileText className="h-4 w-4 text-primary" />
@@ -96,14 +96,14 @@ export function DocumentSidebar({ isOpen, onClose, fileState, activeTab, setActi
                         <h3 className="text-base font-semibold text-foreground mb-1 text-center">Upload PDF Document</h3>
                         <p className="text-xs text-muted-foreground text-center mb-4">Drag and drop your file here, or click to browse</p>
                         <div className="flex items-center gap-2">
-                           <span className="text-[11px] font-medium bg-background px-2.5 py-1 rounded-full border border-border/80 text-muted-foreground">PDF up to 25MB</span>
-                           <span className="text-[11px] font-medium bg-background px-2.5 py-1 rounded-full border border-border/80 text-muted-foreground">Auto-Chunking</span>
+                           <span className="text-[11px] font-medium bg-background dark:bg-zinc-950 px-2.5 py-1 rounded-full border border-border/80 dark:border-white/10 text-muted-foreground">PDF up to 25MB</span>
+                           <span className="text-[11px] font-medium bg-background dark:bg-zinc-950 px-2.5 py-1 rounded-full border border-border/80 dark:border-white/10 text-muted-foreground">Auto-Chunking</span>
                         </div>
                      </div>
 
                      {/* Feature & Security Highlights */}
                      <div className="grid grid-cols-3 gap-2.5 pt-1">
-                        <div className="p-3 rounded-xl border border-border/60 bg-muted/20 text-center space-y-1.5 hover:border-primary/30 transition-colors">
+                        <div className="p-3 rounded-xl border border-border/60 dark:border-white/10 bg-muted/20 dark:bg-zinc-900/40 text-center space-y-1.5 hover:border-primary/30 transition-colors">
                            <div className="h-7 w-7 rounded-lg bg-primary/10 flex items-center justify-center mx-auto text-primary">
                               <ShieldCheck className="h-3.5 w-3.5" />
                            </div>
@@ -111,7 +111,7 @@ export function DocumentSidebar({ isOpen, onClose, fileState, activeTab, setActi
                            <p className="text-[10px] text-muted-foreground leading-tight">Private & Isolated</p>
                         </div>
 
-                        <div className="p-3 rounded-xl border border-border/60 bg-muted/20 text-center space-y-1.5 hover:border-emerald-500/30 transition-colors">
+                        <div className="p-3 rounded-xl border border-border/60 dark:border-white/10 bg-muted/20 dark:bg-zinc-900/40 text-center space-y-1.5 hover:border-emerald-500/30 transition-colors">
                            <div className="h-7 w-7 rounded-lg bg-emerald-500/10 flex items-center justify-center mx-auto text-emerald-600 dark:text-emerald-400">
                               <FileCheck className="h-3.5 w-3.5" />
                            </div>
@@ -119,7 +119,7 @@ export function DocumentSidebar({ isOpen, onClose, fileState, activeTab, setActi
                            <p className="text-[10px] text-muted-foreground leading-tight">Direct page & line refs</p>
                         </div>
 
-                        <div className="p-3 rounded-xl border border-border/60 bg-muted/20 text-center space-y-1.5 hover:border-amber-500/30 transition-colors">
+                        <div className="p-3 rounded-xl border border-border/60 dark:border-white/10 bg-muted/20 dark:bg-zinc-900/40 text-center space-y-1.5 hover:border-amber-500/30 transition-colors">
                            <div className="h-7 w-7 rounded-lg bg-amber-500/10 flex items-center justify-center mx-auto text-amber-600 dark:text-amber-400">
                               <Zap className="h-3.5 w-3.5" />
                            </div>
@@ -143,7 +143,7 @@ export function DocumentSidebar({ isOpen, onClose, fileState, activeTab, setActi
                         <p className="text-xs text-muted-foreground truncate">{fileState.file?.name}</p>
                      </div>
 
-                     <div className="space-y-3 bg-muted/20 p-5 rounded-xl border border-border/60">
+                     <div className="space-y-3 bg-muted/20 dark:bg-zinc-900/40 p-5 rounded-xl border border-border/60 dark:border-white/10">
                         {MOCK_ACTIVITY.map((item, i) => (
                            <ActivityRow key={i} item={item} />
                         ))}
@@ -156,8 +156,8 @@ export function DocumentSidebar({ isOpen, onClose, fileState, activeTab, setActi
             {fileState.status === "complete" && fileState.metadata && (
                <div className="flex-1 flex flex-col overflow-hidden">
                   {/* Segmented Tab Navigation */}
-                  <div className="px-5 py-2.5 border-b border-border/70 bg-muted/20 flex items-center justify-between shrink-0">
-                     <div className="flex items-center gap-1 bg-background/80 p-1 rounded-xl border border-border/70">
+                  <div className="px-5 py-2.5 border-b border-border/70 dark:border-white/10 bg-muted/20 dark:bg-zinc-900/30 flex items-center justify-between shrink-0">
+                     <div className="flex items-center gap-1 bg-background/80 dark:bg-zinc-950/80 p-1 rounded-xl border border-border/70 dark:border-white/10">
                         <button onClick={() => setActiveTab("preview")} className={`flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-lg transition-all ${activeTab === "preview" ? "bg-card text-foreground shadow-xs border border-border/50" : "text-muted-foreground hover:text-foreground"}`}>
                            <FileText className="h-3.5 w-3.5" />
                            <span>Document</span>

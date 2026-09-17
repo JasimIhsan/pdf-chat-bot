@@ -45,9 +45,9 @@ export function ChatMessagesFeed({ messages, fileState, onStarterPromptClick, on
                {/* Starter Prompt Cards */}
                <div className="space-y-2 text-left">
                   {STARTER_PROMPTS.map((prompt, idx) => (
-                     <button key={idx} onClick={() => onStarterPromptClick(prompt.query)} disabled={!fileState.file} className="w-full group p-3 rounded-xl border border-border/70 hover:border-primary/50 bg-muted/20 hover:bg-muted/40 transition-all flex items-center justify-between text-left disabled:opacity-50 disabled:pointer-events-none">
+                     <button key={idx} onClick={() => onStarterPromptClick(prompt.query)} disabled={!fileState.file} className="w-full group p-3 rounded-xl border border-border/70 dark:border-white/10 hover:border-primary/50 dark:hover:border-primary/50 bg-muted/20 dark:bg-zinc-900/40 hover:bg-muted/40 dark:hover:bg-zinc-900/70 transition-all flex items-center justify-between text-left disabled:opacity-50 disabled:pointer-events-none">
                         <div className="flex items-center gap-3">
-                           <div className="h-8 w-8 rounded-lg bg-background border border-border/80 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">{prompt.icon}</div>
+                           <div className="h-8 w-8 rounded-lg bg-background dark:bg-zinc-950 border border-border/80 dark:border-white/10 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">{prompt.icon}</div>
                            <div>
                               <p className="text-xs font-semibold text-foreground group-hover:text-primary transition-colors">{prompt.title}</p>
                               <p className="text-[11px] text-muted-foreground">{prompt.desc}</p>

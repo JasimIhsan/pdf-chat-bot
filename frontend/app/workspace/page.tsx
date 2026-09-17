@@ -1,8 +1,8 @@
 "use client";
 
+import { Navbar } from "@/app/(componets)/Navbar";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
-import { Navbar } from "@/app/(componets)/Navbar";
 import { API_BASE_URL, ChatHeader, ChatInputArea, ChatMessagesFeed, DocumentSidebar, type ChatMessage, type DocumentMetadata, type DocumentState, type LeftTab, type MobileView } from "./(components)";
 
 export default function WorkspacePage() {
@@ -253,57 +253,32 @@ export default function WorkspacePage() {
    };
 
    return (
-      <div className="flex flex-col h-screen w-full bg-muted/30 dark:bg-zinc-950 text-foreground overflow-hidden font-sans">
+      <div className="flex flex-col h-screen w-full bg-background dark:bg-zinc-950 text-foreground overflow-hidden font-sans">
          {/* Top Navbar matching Home page */}
          <Navbar />
 
-         {/* Main Workspace Container with standard side padding */}
+         {/* Main Workspace Container with standard side padding matching home */}
          <div className="container mx-auto px-4 md:px-8 max-w-screen-2xl flex-1 flex min-h-0 py-3 md:py-4 gap-3 md:gap-3.5 overflow-hidden">
             {/* Hidden File Input */}
             <input type="file" ref={fileInputRef} className="hidden" accept="application/pdf" onChange={(e) => e.target.files?.[0] && handleFileSelect(e.target.files[0])} />
 
             {/* Left Panel (Document & Data Hub) - In mobile view shows as primary upload/doc screen */}
-            <DocumentSidebar
-               isOpen={isSidebarOpen}
-               onClose={() => setIsSidebarOpen(false)}
-               fileState={fileState}
-               activeTab={activeTab}
-               setActiveTab={setActiveTab}
-               isDragging={isDragging}
-               fileInputRef={fileInputRef}
-               onDragOver={onDragOver}
-               onDragLeave={onDragLeave}
-               onDrop={onDrop}
-               mobileView={mobileView}
-               setMobileView={setMobileView}
-            />
+            <DocumentSidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} fileState={fileState} activeTab={activeTab} setActiveTab={setActiveTab} isDragging={isDragging} fileInputRef={fileInputRef} onDragOver={onDragOver} onDragLeave={onDragLeave} onDrop={onDrop} mobileView={mobileView} setMobileView={setMobileView} />
 
             {/* Right Panel (Chatting Interface) - In mobile view shows after upload or when selected */}
             <main
                className={`
                   ${mobileView === "chat" ? "flex w-full" : "hidden"}
                   ${isSidebarOpen ? "md:flex flex-1" : "md:flex flex-1"}
-                  min-w-0 flex-col h-full overflow-hidden relative bg-card border border-border/80 rounded-2xl shadow-sm transition-all duration-300
+                  min-w-0 flex-col h-full overflow-hidden relative bg-card/70 dark:bg-zinc-950/50 backdrop-blur-xl border border-border/80 dark:border-white/10 rounded-2xl shadow-sm transition-all duration-300
                `}
             >
                {/* Header */}
-               <ChatHeader
-                  isSidebarOpen={isSidebarOpen}
-                  setIsSidebarOpen={setIsSidebarOpen}
-                  onClearChat={clearChat}
-                  mobileView={mobileView}
-                  setMobileView={setMobileView}
-                  fileState={fileState}
-               />
+               <ChatHeader isSidebarOpen={isSidebarOpen} setIsSidebarOpen={setIsSidebarOpen} onClearChat={clearChat} mobileView={mobileView} setMobileView={setMobileView} fileState={fileState} />
 
                {/* Chat Messages Feed */}
                <div className="flex-1 overflow-hidden relative">
-                  <ChatMessagesFeed
-                     messages={messages}
-                     fileState={fileState}
-                     onStarterPromptClick={executeQuery}
-                     onUploadClick={() => setMobileView("document")}
-                  />
+                  <ChatMessagesFeed messages={messages} fileState={fileState} onStarterPromptClick={executeQuery} onUploadClick={() => setMobileView("document")} />
                </div>
 
                {/* Floating Input Area */}

@@ -39,7 +39,7 @@ export function ChatInputArea({ query, setQuery, onSend, onStop, isSending, file
             {/* Responsive Floating Input Bar & Standalone Action Button */}
             <div className="flex items-center gap-2">
                {/* Floating Input Box with rounded corners */}
-               <div className="flex-1 min-w-0 bg-muted/30 dark:bg-zinc-900 border border-border/80 rounded-full px-4 py-1.5 shadow-sm focus-within:border-primary/50 focus-within:ring-2 focus-within:ring-primary/10 transition-all flex items-center">
+               <div className="flex-1 min-w-0 bg-muted/30 dark:bg-zinc-900/90 backdrop-blur-md border border-border/80 dark:border-white/15 rounded-full px-4 py-1.5 shadow-sm focus-within:border-primary/50 focus-within:ring-2 focus-within:ring-primary/10 transition-all flex items-center">
                   <Textarea
                      value={query}
                      onChange={(e) => setQuery(e.target.value)}
