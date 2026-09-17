@@ -7,20 +7,20 @@ export function Workflow() {
    const steps = [
       {
          id: 1,
-         title: "Upload & Ingest",
-         description: "Document parsing and recursive chunking engine processes your multi-page files instantly.",
+         title: "Upload & Ingestion",
+         description: "PyPDF multi-page parsing and recursive text splitting (1,000-char chunks with 200-char overlap) preserve document structure.",
          icon: <UploadCloud className="h-6 w-6 text-primary" />,
       },
       {
          id: 2,
-         title: "Vector Embedding",
-         description: "High-dimensional embedding models index vectorized chunks into low-latency semantic indices.",
+         title: "Vector Embeddings & Pinecone",
+         description: "Google Gemini 768-dimensional embeddings index vectorized chunks into low-latency Pinecone vector stores with metadata isolation.",
          icon: <Database className="h-6 w-6 text-primary" />,
       },
       {
          id: 3,
-         title: "Natural Language Retrieval",
-         description: "Context retrieval + grounded neural synthesis with live streaming responses right to your screen.",
+         title: "LCEL Retrieval & Streaming",
+         description: "Top-4 contextual similarity search combined with Google Gemini LLM synthesis and real-time chunked token streaming.",
          icon: <MessageSquare className="h-6 w-6 text-primary" />,
       },
    ];

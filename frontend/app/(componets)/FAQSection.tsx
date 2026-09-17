@@ -8,7 +8,7 @@ export function FAQSection() {
       {
          id: "limit",
          title: "What are the file size limits?",
-         description: "Currently, you can upload PDFs up to 50MB in size. This ensures fast processing and optimal chunking without timing out the backend services.",
+         description: "Currently, you can upload PDFs up to 10MB in size. This ensures fast processing, optimal chunking, and low-latency vector indexing in our backend pipeline.",
          icon: <FileText className="h-4 w-4 text-primary" />,
       },
       {

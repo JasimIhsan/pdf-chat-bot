@@ -30,8 +30,8 @@ export function FeaturesBento() {
                   <div className="h-9 w-9 sm:h-10 sm:w-10 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center mb-3 sm:mb-4 text-primary">
                      <Database className="w-4 h-4 sm:w-5 sm:h-5" />
                   </div>
-                  <h3 className="text-xl sm:text-2xl font-semibold mb-2 text-foreground">High-Dimensional Vector Space</h3>
-                  <p className="text-muted-foreground max-w-md text-xs sm:text-sm leading-relaxed">Vectorized document representations indexed for sub-millisecond semantic similarity search, enabling instant matching across complex document corpora.</p>
+                  <h3 className="text-xl sm:text-2xl font-semibold mb-2 text-foreground">Pinecone 768-D Vector Space</h3>
+                  <p className="text-muted-foreground max-w-md text-xs sm:text-sm leading-relaxed">Document chunks are transformed into 768-dimensional embeddings via Google Gemini and indexed into Pinecone with isolated metadata filtering for sub-millisecond retrieval.</p>
                </div>
             </motion.div>
 
@@ -47,8 +47,8 @@ export function FeaturesBento() {
                   <Search className="w-4 h-4 sm:w-5 sm:h-5" />
                </div>
                <div>
-                  <h3 className="text-lg sm:text-xl font-semibold mb-2 text-foreground">Contextual Retrieval</h3>
-                  <p className="text-muted-foreground text-xs sm:text-sm leading-relaxed">Precision cosine-distance scoring and dynamic metadata filtering isolate only the exact relevant excerpts for each query.</p>
+                  <h3 className="text-lg sm:text-xl font-semibold mb-2 text-foreground">Top-K Context Retrieval</h3>
+                  <p className="text-muted-foreground text-xs sm:text-sm leading-relaxed">Cosine-distance similarity scoring fetches the top 4 most relevant text excerpts with strict document ID isolation per conversation.</p>
                </div>
             </motion.div>
 
@@ -64,8 +64,8 @@ export function FeaturesBento() {
                   <FileCode2 className="w-4 h-4 sm:w-5 sm:h-5" />
                </div>
                <div>
-                  <h3 className="text-lg sm:text-xl font-semibold mb-2 text-foreground">Ingestion & Chunking</h3>
-                  <p className="text-muted-foreground text-xs sm:text-sm leading-relaxed">Recursive multi-stage text splitting with contextual overlap preserves semantic boundaries and paragraph continuity.</p>
+                  <h3 className="text-lg sm:text-xl font-semibold mb-2 text-foreground">Recursive Chunking Engine</h3>
+                  <p className="text-muted-foreground text-xs sm:text-sm leading-relaxed">PyPDF stream extraction with LangChain recursive character splitting (1,000-char chunks, 200-char overlap) preserves semantic paragraph flow.</p>
                </div>
             </motion.div>
 
@@ -84,8 +84,8 @@ export function FeaturesBento() {
                   <div className="h-9 w-9 sm:h-10 sm:w-10 rounded-xl bg-primary/20 border border-primary/30 flex items-center justify-center mb-3 sm:mb-4 text-primary">
                      <Sparkles className="w-4 h-4 sm:w-5 sm:h-5" />
                   </div>
-                  <h3 className="text-xl sm:text-2xl font-semibold mb-2 text-foreground">Grounded Neural Synthesis</h3>
-                  <p className="text-muted-foreground max-w-md text-xs sm:text-sm leading-relaxed">Direct source-grounded response generation strictly bound to retrieved document segments, eliminating hallucinations with real-time token streaming.</p>
+                  <h3 className="text-xl sm:text-2xl font-semibold mb-2 text-foreground">Grounded LCEL Neural Synthesis</h3>
+                  <p className="text-muted-foreground max-w-md text-xs sm:text-sm leading-relaxed">LangChain Expression Language (LCEL) chain couples the retriever to Google Gemini with anti-hallucination guardrails and asynchronous chunked token streaming.</p>
                </div>
             </motion.div>
          </div>

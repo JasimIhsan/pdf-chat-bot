@@ -27,6 +27,7 @@ export interface StatefulButtonProps extends Omit<ButtonProps, "children"> {
   successText?: ReactNode;
   errorText?: ReactNode;
   icon?: ReactNode;
+  iconPlacement?: "left" | "right";
 }
 
 const CASCADE_STAGGER = 0.025;
@@ -184,6 +185,7 @@ export const StatefulButton = forwardRef<HTMLButtonElement, StatefulButtonProps>
     successText = "Done",
     errorText = "Try again",
     icon,
+    iconPlacement = "right",
     disabled,
     ...rest
   },
@@ -225,11 +227,17 @@ export const StatefulButton = forwardRef<HTMLButtonElement, StatefulButtonProps>
           ) : null}
         </AnimatePresence>
 
+        <AnimatePresence initial={false}>
+          {state === "idle" && icon && iconPlacement === "left" ? (
+            <IconSlot keyId="idle-icon-left">{icon}</IconSlot>
+          ) : null}
+        </AnimatePresence>
+
         <TextSlot value={textKey}>{stateText}</TextSlot>
 
         <AnimatePresence initial={false}>
-          {state === "idle" && icon ? (
-            <IconSlot keyId="idle-icon">{icon}</IconSlot>
+          {state === "idle" && icon && iconPlacement === "right" ? (
+            <IconSlot keyId="idle-icon-right">{icon}</IconSlot>
           ) : null}
         </AnimatePresence>
       </span>
