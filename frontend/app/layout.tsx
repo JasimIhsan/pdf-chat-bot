@@ -25,7 +25,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
    return (
-      <html lang="en" className={cn("dark h-full antialiased", geistSans.variable, geistMono.variable, "font-sans", inter.variable)}>
+      <html lang="en" suppressHydrationWarning className={cn("dark h-full antialiased", geistSans.variable, geistMono.variable, "font-sans", inter.variable)}>
          <body className="min-h-full flex flex-col bg-background text-foreground">
             <ThemeProvider attribute="class" defaultTheme="dark" forcedTheme="dark" enableSystem={false}>
                {children}
