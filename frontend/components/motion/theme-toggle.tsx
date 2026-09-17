@@ -164,7 +164,7 @@ export function useThemeToggle({ variant = "rectangle", start = "bottom-up" }: {
    return { isDark, mounted, toggle };
 }
 
-export function ThemeToggle({ variant = "rectangle", start = "bottom-up", className, iconClassName, ...rest }: ThemeToggleProps) {
+export function ThemeToggle({ variant = "circle-blur", start = "top-right", className, iconClassName, ...rest }: ThemeToggleProps) {
    const { isDark, mounted, toggle } = useThemeToggle({ variant, start });
 
    return (

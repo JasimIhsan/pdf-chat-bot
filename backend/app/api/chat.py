@@ -28,18 +28,47 @@ def format_docs(docs):
 	return "\n\n".join(doc.page_content for doc in docs)
 
 
+import asyncio
+
 @router.post("/")
 async def chat_with_pdf(payload: ChatPayload):
 	"""
 	Endpoint to perform streaming Retrieval-Augmented Generation (RAG) on a specific PDF.
-	
-	Workflow:
-	1. Retrieves the most relevant text chunks from the vector store for the given document ID.
-	2. Constructs a prompt embedding the retrieved context and user question with anti-hallucination instructions.
-	3. Configures the Gemini LLM with streaming support.
-	4. Builds a LangChain LCEL pipeline to execute retrieval, formatting, prompting, model inference, and output parsing.
-	5. Streams the generated answer tokens back to the client in real-time.
 	"""
+	# --- TEMPORARY MOCK BYPASS FOR UI TESTING ---
+	async def mock_stream_generator() -> AsyncIterable[str]:
+		mock_text = f"""### 📊 Analysis Summary
+
+Based on your document (`{payload.doc_id}`), here are the key findings for: **"{payload.question}"**
+
+#### 🔑 Key Highlights
+* **Decoupled Microservice Architecture**: The document outlines high-availability ingestion workflows with distributed vector embeddings.
+* **Pinecone Vector Indexing**: Chunks are stored with metadata filtering for isolated tenant contexts.
+* **Low Latency Synthesis**: Real-time response streaming with grounded LLM synthesis.
+
+#### 💻 Ingestion Example
+```python
+# Sample snippet referenced from document section 3.2
+from langchain_pinecone import PineconeVectorStore
+
+vector_store = PineconeVectorStore(
+    index_name="pdf-chatbot",
+    embedding=gemini_embeddings,
+    namespace="{payload.doc_id}"
+)
+```
+
+> **Note**: Verify exact citations on page 2 and page 5 before deployment.
+"""
+		import re
+		# Stream tokens preserving all newlines, spaces, and indents
+		tokens = re.split(r'(\s+)', mock_text)
+		for token in tokens:
+			if token:
+				yield token
+				await asyncio.sleep(0.015)
+
+	return StreamingResponse(mock_stream_generator(), media_type="text/plain")
 
 	# -------------------------------------------------------------------------
 	# Step 1: Configure Document Retriever

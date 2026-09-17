@@ -39,6 +39,17 @@ vector_store = PineconeVectorStore(index=index, embedding=embeddings)
 
 @router.post("/upload")
 async def upload_document(file: UploadFile = File(...)):
+	# --- TEMPORARY MOCK BYPASS FOR UI TESTING ---
+	return {
+		"status": "success",
+		"doc_id": "mock-doc-" + str(uuid.uuid4())[:8],
+		"filename": file.filename or "sample.pdf",
+		"total_pages": 3,
+		"total_chunks": 12,
+		"file_size_bytes": 102400,
+		"character_count": 4500,
+	}
+
 	# 1. Validate file extension and MIME type
 	if not file.filename or not file.filename.lower().endswith(".pdf") or file.content_type != "application/pdf":
 		raise HTTPException(
