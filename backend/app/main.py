@@ -22,14 +22,25 @@ app = FastAPI(
 )
 
 # CORS Configuration
-app.add_middleware(
-	CORSMiddleware,
-	allow_origins=settings.CORS_ORIGINS,
-	allow_origin_regex=r"^https?://(localhost|127\.0\.0\.1)(:\d+)?$",
-	allow_credentials=True,
-	allow_methods=["*"],
-	allow_headers=["*"],
-)
+if settings.is_production:
+	# Production: strictly allow configured explicit origins
+	app.add_middleware(
+		CORSMiddleware,
+		allow_origins=settings.CORS_ORIGINS,
+		allow_credentials=True,
+		allow_methods=["*"],
+		allow_headers=["*"],
+	)
+else:
+	# Development: allow localhost ports and development origins
+	app.add_middleware(
+		CORSMiddleware,
+		allow_origins=settings.CORS_ORIGINS,
+		allow_origin_regex=r"^https?://(localhost|127\.0\.0\.1)(:\d+)?$",
+		allow_credentials=True,
+		allow_methods=["*"],
+		allow_headers=["*"],
+	)
 
 # Register API Routers
 app.include_router(api_router, prefix=settings.API_V1_STR)

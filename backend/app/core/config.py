@@ -21,12 +21,11 @@ class Settings(BaseSettings):
 	CHUNK_SIZE: int = 1000
 	CHUNK_OVERLAP: int = 200
 
-	# Security & Cors
+	# Environment & Security
+	ENVIRONMENT: str = "development"
 	CORS_ORIGINS: List[str] = [
+		"https://pdfchatbot.jasimihsan.in",
 		"http://localhost:3000",
-		"http://127.0.0.1:3000",
-		"http://localhost:3001",
-		"http://127.0.0.1:3001",
 	]
 
 	model_config = SettingsConfigDict(
@@ -34,6 +33,10 @@ class Settings(BaseSettings):
 		case_sensitive=True, 
 		extra="ignore"
 	)
+
+	@property
+	def is_production(self) -> bool:
+		return self.ENVIRONMENT.lower() in ("production", "prod")
 
 	@property
 	def max_file_size_bytes(self) -> int:
