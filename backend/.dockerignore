@@ -1,0 +1,46 @@
+# Git & IDE
+.git
+.gitignore
+.github
+.idea
+.vscode
+*.sublime-project
+*.sublime-workspace
+
+# Python bytecode & cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+.ruff_cache/
+
+# Virtual Environments
+.venv/
+venv/
+ENV/
+env/
+.env.local
+.env.*.local
+
+# Sensitive files & Environment variables
+# (Never bake secrets into container images; supply via AWS Lambda environment variables or AWS Secrets Manager)
+.env
+
+# Project-specific / Frontend
+frontend/
+docs/
+*.md
+*.log
+
+# Docker & OS artifacts
+Dockerfile*
+.dockerignore
+docker-compose*.yml
+.DS_Store
+.AppleDouble
+.LSOverride
+Thumbs.db
