@@ -11,9 +11,11 @@ export type DocumentMetadata = {
    character_count: number;
 };
 
+export type DocumentStatus = "idle" | "selected" | "uploading" | "complete";
+
 export type DocumentState = {
    file: File | null;
-   status: "idle" | "uploading" | "complete";
+   status: DocumentStatus;
    metadata: DocumentMetadata | null;
    previewUrl: string | null;
 };

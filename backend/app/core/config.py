@@ -1,0 +1,42 @@
+from typing import List
+from pydantic_settings import BaseSettings, SettingsConfigDict
+
+class Settings(BaseSettings):
+	PROJECT_NAME: str = "PDF Chat API"
+	VERSION: str = "1.0.0"
+	API_V1_STR: str = "/api/v1"
+
+	# API Keys & Cloud Configuration
+	GEMINI_API_KEY: str
+	PINECONE_API_KEY: str
+	PINECONE_INDEX_NAME: str = "pdf-chatbot"
+
+	# Models and LLMs
+	EMBEDDING_MODEL: str = "models/gemini-embedding-2"
+	LLM_MODEL: str = "gemini-3.5-flash-lite"
+	LLM_TEMPERATURE: float = 0.2
+
+	# Ingestion Constraint & Chunking
+	MAX_FILE_SIZE_MB: int = 10
+	CHUNK_SIZE: int = 1000
+	CHUNK_OVERLAP: int = 200
+
+	# Security & Cors
+	CORS_ORIGINS: List[str] = [
+		"http://localhost:3000",
+		"http://127.0.0.1:3000",
+		"http://localhost:3001",
+		"http://127.0.0.1:3001",
+	]
+
+	model_config = SettingsConfigDict(
+		env_file=".env", 
+		case_sensitive=True, 
+		extra="ignore"
+	)
+
+	@property
+	def max_file_size_bytes(self) -> int:
+		return self.MAX_FILE_SIZE_MB * 1024 * 1024
+
+settings = Settings()

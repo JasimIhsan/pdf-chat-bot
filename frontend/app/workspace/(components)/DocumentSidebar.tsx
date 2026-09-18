@@ -2,7 +2,7 @@
 
 import { ActivityRow } from "@/components/agents/agent-activity/activity-row";
 import { Tooltip } from "@/components/motion/tooltip";
-import { BarChart3, CheckCircle2, ChevronDown, Database, FileCheck, FileText, Hash, Layers, MessageSquare, PanelLeftClose, RefreshCw, ShieldCheck, Type, UploadCloud, Zap } from "lucide-react";
+import { ArrowRight, BarChart3, CheckCircle2, ChevronDown, Database, FileCheck, FileText, Hash, Layers, MessageSquare, PanelLeftClose, RefreshCw, ShieldCheck, Trash2, Type, UploadCloud, Zap } from "lucide-react";
 import type { RefObject } from "react";
 import { MOCK_ACTIVITY, MOCK_CHUNKS } from "./constants";
 import type { DocumentState, LeftTab, MobileView } from "./types";
@@ -18,11 +18,20 @@ interface DocumentSidebarProps {
    onDragOver: (e: React.DragEvent) => void;
    onDragLeave: (e: React.DragEvent) => void;
    onDrop: (e: React.DragEvent) => void;
+   onSubmitDocument?: () => void;
+   onRemoveFile?: () => void;
    mobileView?: MobileView;
    setMobileView?: (view: MobileView) => void;
 }
 
-export function DocumentSidebar({ isOpen, onClose, fileState, activeTab, setActiveTab, isDragging, fileInputRef, onDragOver, onDragLeave, onDrop, mobileView, setMobileView }: DocumentSidebarProps) {
+export function DocumentSidebar({ isOpen, onClose, fileState, activeTab, setActiveTab, isDragging, fileInputRef, onDragOver, onDragLeave, onDrop, onSubmitDocument, onRemoveFile, mobileView, setMobileView }: DocumentSidebarProps) {
+   const formatFileSize = (bytes: number) => {
+      if (bytes < 1024 * 1024) {
+         return `${(bytes / 1024).toFixed(1)} KB`;
+      }
+      return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
+   };
+
    return (
       <aside
          className={`
@@ -41,6 +50,8 @@ export function DocumentSidebar({ isOpen, onClose, fileState, activeTab, setActi
                   <div className="flex items-center gap-1.5 sm:gap-2">
                      <h1 className="font-semibold text-xs sm:text-sm truncate max-w-32 xs:max-w-48 sm:max-w-xs">{fileState.file ? fileState.file.name : "Document Intelligence"}</h1>
                      {fileState.status === "complete" && <span className="hidden sm:inline-flex text-[10px] sm:text-[11px] font-medium bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 px-1.5 sm:px-2 py-0.5 rounded-full border border-emerald-500/20 shrink-0">Indexed</span>}
+                     {fileState.status === "selected" && <span className="hidden sm:inline-flex text-[10px] sm:text-[11px] font-medium bg-amber-500/10 text-amber-600 dark:text-amber-400 px-1.5 sm:px-2 py-0.5 rounded-full border border-amber-500/20 shrink-0">Selected</span>}
+                     {fileState.status === "uploading" && <span className="hidden sm:inline-flex text-[10px] sm:text-[11px] font-medium bg-primary/10 text-primary px-1.5 sm:px-2 py-0.5 rounded-full border border-primary/20 shrink-0 animate-pulse">Uploading</span>}
                   </div>
                </div>
             </div>
@@ -137,7 +148,61 @@ export function DocumentSidebar({ isOpen, onClose, fileState, activeTab, setActi
                </div>
             )}
 
-            {/* 2. Uploading / Indexing State */}
+            {/* 2. Selected State (Pending Submit) */}
+            {fileState.status === "selected" && fileState.file && (
+               <div className="flex-1 overflow-y-auto p-4 sm:p-6 flex flex-col justify-between">
+                  <div className="space-y-4">
+                     {/* Selected File Card */}
+                     <div className="p-4 rounded-xl border border-border/80 dark:border-white/10 bg-muted/30 dark:bg-zinc-900/50 space-y-3">
+                        <div className="flex items-start justify-between gap-3">
+                           <div className="flex items-center gap-3 min-w-0 flex-1">
+                              <div className="h-10 w-10 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center shrink-0">
+                                 <FileText className="h-5 w-5 text-primary" />
+                              </div>
+                              <div className="min-w-0 flex-1">
+                                 <p className="text-sm font-semibold truncate text-foreground">{fileState.file.name}</p>
+                                 <p className="text-xs text-muted-foreground">{formatFileSize(fileState.file.size)} • PDF Ready</p>
+                              </div>
+                           </div>
+                           {onRemoveFile && (
+                              <button onClick={onRemoveFile} className="h-8 w-8 flex items-center justify-center rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors shrink-0" title="Remove file">
+                                 <Trash2 className="h-4 w-4" />
+                              </button>
+                           )}
+                        </div>
+
+                        <div className="text-xs text-muted-foreground bg-background/60 dark:bg-zinc-950/60 p-2.5 rounded-lg border border-border/60">
+                           💡 Click <strong>Submit Document</strong> below to upload, extract text, and build the vector search index.
+                        </div>
+                     </div>
+
+                     {/* PDF Preview Frame */}
+                     {fileState.previewUrl && (
+                        <div className="rounded-xl overflow-hidden border border-border/70 bg-muted/10 h-72 sm:h-96 flex flex-col">
+                           <div className="px-3 py-1.5 bg-muted/30 border-b border-border/60 text-[11px] font-medium text-muted-foreground flex items-center justify-between">
+                              <span>Selected File Preview</span>
+                              <span>Ready</span>
+                           </div>
+                           <iframe src={`${fileState.previewUrl}#toolbar=0&navpanes=0`} className="w-full h-full border-0" title="PDF Document Preview" />
+                        </div>
+                     )}
+                  </div>
+
+                  {/* Submit and Action Buttons */}
+                  <div className="pt-4 border-t border-border/60 flex flex-col sm:flex-row gap-2.5">
+                     <button onClick={onSubmitDocument} className="flex-1 h-11 px-4 rounded-xl bg-primary text-primary-foreground font-semibold text-sm flex items-center justify-center gap-2 shadow-sm hover:bg-primary/90 active:scale-[0.99] transition-all cursor-pointer">
+                        <UploadCloud className="h-4 w-4" />
+                        <span>Submit Document</span>
+                        <ArrowRight className="h-4 w-4 ml-0.5" />
+                     </button>
+                     <button onClick={() => fileInputRef.current?.click()} className="h-11 px-4 rounded-xl border border-border/80 bg-muted/40 hover:bg-muted text-muted-foreground hover:text-foreground font-medium text-xs transition-colors cursor-pointer">
+                        Change File
+                     </button>
+                  </div>
+               </div>
+            )}
+
+            {/* 3. Uploading / Indexing State */}
             {fileState.status === "uploading" && (
                <div className="flex-1 p-8 flex flex-col justify-center items-center">
                   <div className="max-w-md w-full space-y-6">
@@ -158,7 +223,7 @@ export function DocumentSidebar({ isOpen, onClose, fileState, activeTab, setActi
                </div>
             )}
 
-            {/* 3. Document Loaded State with Dropdown Switcher */}
+            {/* 4. Document Loaded State with Dropdown Switcher */}
             {fileState.status === "complete" && fileState.metadata && (
                <div className="flex-1 flex flex-col overflow-hidden">
                   {/* View Mode Dropdown Navigation Bar */}

@@ -23,9 +23,9 @@ export default function WorkspacePage() {
    const [messages, setMessages] = useState<ChatMessage[]>([]);
    const [isSending, setIsSending] = useState(false);
 
-   const handleFileSelect = async (selectedFile: File) => {
+   const handleFileSelect = (selectedFile: File) => {
       const url = URL.createObjectURL(selectedFile);
-      setFileState({ file: selectedFile, status: "uploading", metadata: null, previewUrl: url });
+      setFileState({ file: selectedFile, status: "selected", metadata: null, previewUrl: url });
       setActiveTab("preview");
       // Reset chat screen on document change
       setMessages([]);
@@ -36,6 +36,23 @@ export default function WorkspacePage() {
          abortControllerRef.current.abort();
          abortControllerRef.current = null;
       }
+
+      // Reset file input value so re-selecting same file triggers onChange
+      if (fileInputRef.current) {
+         fileInputRef.current.value = "";
+      }
+
+      toast.info("Document selected", {
+         description: `"${selectedFile.name}" selected. Click 'Submit Document' to upload and index.`,
+      });
+   };
+
+   const handleSubmitDocument = async () => {
+      if (!fileState.file || fileState.status === "uploading") return;
+
+      const selectedFile = fileState.file;
+      const currentPreviewUrl = fileState.previewUrl || URL.createObjectURL(selectedFile);
+      setFileState((prev) => ({ ...prev, status: "uploading" }));
 
       try {
          const formData = new FormData();
@@ -56,7 +73,7 @@ export default function WorkspacePage() {
          setFileState({
             file: selectedFile,
             status: "complete",
-            previewUrl: url,
+            previewUrl: currentPreviewUrl,
             metadata: data,
          });
 
@@ -69,16 +86,29 @@ export default function WorkspacePage() {
       } catch (err: any) {
          console.error("Failed to upload document:", err);
          toast.error("Upload Failed", {
-            description: err?.message || "Could not connect to backend server at " + API_BASE_URL,
+            description: err?.message || "Could not connect to backend server at " + API_BASE_URL + ". Please ensure your backend is running.",
          });
-         setFileState({
-            file: null,
-            status: "idle",
-            metadata: null,
-            previewUrl: null,
-         });
-         setMobileView("document");
+         // Keep file selected so the user can easily retry submission without choosing the file again
+         setFileState((prev) => ({
+            ...prev,
+            status: "selected",
+         }));
       }
+   };
+
+   const handleRemoveFile = () => {
+      setFileState({
+         file: null,
+         status: "idle",
+         metadata: null,
+         previewUrl: null,
+      });
+      setMessages([]);
+      setQuery("");
+      if (fileInputRef.current) {
+         fileInputRef.current.value = "";
+      }
+      toast("File selection cleared");
    };
 
    const onDragOver = (e: React.DragEvent) => {
@@ -263,7 +293,22 @@ export default function WorkspacePage() {
             <input type="file" ref={fileInputRef} className="hidden" accept="application/pdf" onChange={(e) => e.target.files?.[0] && handleFileSelect(e.target.files[0])} />
 
             {/* Left Panel (Document & Data Hub) - In mobile view shows as primary upload/doc screen */}
-            <DocumentSidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} fileState={fileState} activeTab={activeTab} setActiveTab={setActiveTab} isDragging={isDragging} fileInputRef={fileInputRef} onDragOver={onDragOver} onDragLeave={onDragLeave} onDrop={onDrop} mobileView={mobileView} setMobileView={setMobileView} />
+            <DocumentSidebar
+               isOpen={isSidebarOpen}
+               onClose={() => setIsSidebarOpen(false)}
+               fileState={fileState}
+               activeTab={activeTab}
+               setActiveTab={setActiveTab}
+               isDragging={isDragging}
+               fileInputRef={fileInputRef}
+               onDragOver={onDragOver}
+               onDragLeave={onDragLeave}
+               onDrop={onDrop}
+               onSubmitDocument={handleSubmitDocument}
+               onRemoveFile={handleRemoveFile}
+               mobileView={mobileView}
+               setMobileView={setMobileView}
+            />
 
             {/* Right Panel (Chatting Interface) - In mobile view shows after upload or when selected */}
             <main

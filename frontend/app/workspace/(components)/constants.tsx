@@ -2,7 +2,8 @@ import type { AgentActivityItem } from "@/components/agents/agent-activity/types
 import { BarChart3, FileCheck, FileText, Layers, Search, Sparkles } from "lucide-react";
 import type { StarterPrompt, TemplateQuestion } from "./types";
 
-export const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
+const rawApiBase = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000/api/v1";
+export const API_BASE_URL = rawApiBase.endsWith("/api/v1") ? rawApiBase.replace(/\/$/, "") : `${rawApiBase.replace(/\/$/, "")}/api/v1`;
 
 export const MOCK_ACTIVITY: AgentActivityItem[] = [
    { id: "1", type: "step", status: "complete", label: "Extracting text from PDF" },

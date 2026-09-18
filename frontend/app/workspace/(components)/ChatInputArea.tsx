@@ -20,7 +20,7 @@ export function ChatInputArea({ query, setQuery, onSend, onStop, isSending, file
       <div className="p-3 md:p-4 bg-transparent shrink-0 z-10">
          <div className="max-w-3xl mx-auto space-y-2.5">
             {/* Redesigned Template Questions Chips */}
-            {fileState.file && (
+            {fileState.status === "complete" && (
                <div className="flex items-center gap-1.5 overflow-x-auto pb-0.5 scrollbar-none">
                   {TEMPLATE_QUESTIONS.map((tq, i) => (
                      <button
@@ -46,13 +46,23 @@ export function ChatInputArea({ query, setQuery, onSend, onStop, isSending, file
                      onKeyDown={(e) => {
                         if (e.key === "Enter" && !e.shiftKey) {
                            e.preventDefault();
-                           onSend(query);
+                           if (fileState.status === "complete") {
+                              onSend(query);
+                           }
                         }
                      }}
-                     placeholder={fileState.file ? "Ask a question about your document..." : "Upload a PDF document to begin..."}
+                     placeholder={
+                        fileState.status === "complete"
+                           ? "Ask a question about your document..."
+                           : fileState.status === "selected"
+                           ? "Click 'Submit Document' in the left panel to index & start chatting..."
+                           : fileState.status === "uploading"
+                           ? "Indexing document vectors..."
+                           : "Upload a PDF document to begin..."
+                     }
                      rows={1}
                      className="min-h-9.5 max-h-28 resize-none border-0 shadow-none focus-visible:ring-0 bg-transparent dark:bg-transparent text-sm py-2 px-0 text-foreground placeholder:text-muted-foreground/60 leading-tight w-full"
-                     disabled={!fileState.file}
+                     disabled={fileState.status !== "complete"}
                   />
                </div>
 
@@ -68,8 +78,8 @@ export function ChatInputArea({ query, setQuery, onSend, onStop, isSending, file
                      <Tooltip content={query.trim() ? "Send message (Enter)" : "Enter a message"} side="top">
                         <button
                            onClick={() => onSend(query)}
-                           disabled={!fileState.file || !query.trim()}
-                           className={`h-11 w-11 rounded-full flex items-center justify-center transition-all shadow-sm ${fileState.file && query.trim() ? "bg-primary text-primary-foreground hover:scale-105 active:scale-95 shadow-primary/20 hover:shadow-md" : "bg-muted/80 border border-border/60 text-muted-foreground/40 cursor-not-allowed"}`}
+                           disabled={fileState.status !== "complete" || !query.trim()}
+                           className={`h-11 w-11 rounded-full flex items-center justify-center transition-all shadow-sm ${fileState.status === "complete" && query.trim() ? "bg-primary text-primary-foreground hover:scale-105 active:scale-95 shadow-primary/20 hover:shadow-md cursor-pointer" : "bg-muted/80 border border-border/60 text-muted-foreground/40 cursor-not-allowed"}`}
                         >
                            <ArrowUp className="h-4 w-4" strokeWidth={2.2} />
                         </button>

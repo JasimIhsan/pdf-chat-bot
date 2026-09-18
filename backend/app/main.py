@@ -1,30 +1,47 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.api.health import router as health_router
-from app.api.documents import router as document_router
-from app.api.chat import router as chat_router
+from mangum import Mangum
+
+from app.api.router import api_router
+from app.core.config import settings
+from app.core.logging import logger
+from app.services.vector_service import vector_service
+
+# Run one-time initialization during container boot
+try:
+	logger.info("Initializing vector service...")
+	vector_service.initialize()
+	logger.info(f"{settings.PROJECT_NAME} initialized.")
+except Exception as e:
+	logger.error(f"Failed to initialize services: {e}")
 
 app = FastAPI(
-	title="PDF Chatbot API",
-	description="PDF Chatbot API",
-	version="1.0.0"
+	title=settings.PROJECT_NAME,
+	description="Production-grade RAG PDF Chatbot Backend API with Google Gemini and Pinecone",
+	version=settings.VERSION,
 )
 
-# Enable CORS for local frontend development
+# CORS Configuration
 app.add_middleware(
 	CORSMiddleware,
-	allow_origins=["*"],
+	allow_origins=settings.CORS_ORIGINS,
+	allow_origin_regex=r"^https?://(localhost|127\.0\.0\.1)(:\d+)?$",
 	allow_credentials=True,
 	allow_methods=["*"],
 	allow_headers=["*"],
 )
 
-# Register routes
-app.include_router(health_router)
-app.include_router(document_router)
-app.include_router(chat_router)
-app.include_router(chat_router, prefix="/documents")
+# Register API Routers
+app.include_router(api_router, prefix=settings.API_V1_STR)
 
 @app.get("/")
 def root():
-	return {"message": "Welcome to PDF Chatbot Backend."}
+	return {
+		"service": settings.PROJECT_NAME,
+		"version": settings.VERSION,
+		"docs_url": "/docs",
+		"api_v1": settings.API_V1_STR,
+	}
+
+# Handler with lifespan explicitly disabled for Lambda performance
+handler = Mangum(app, lifespan="off")

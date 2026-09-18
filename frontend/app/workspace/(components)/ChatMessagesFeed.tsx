@@ -29,8 +29,22 @@ export function ChatMessagesFeed({ messages, fileState, onStarterPromptClick, on
                   <div className="h-12 w-12 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto border border-primary/20 shadow-xs">
                      <Sparkles className="h-6 w-6 text-primary" />
                   </div>
-                  <h2 className="text-lg font-semibold text-foreground">{fileState.file ? `Ask about ${fileState.file.name}` : "Grounded PDF Assistant"}</h2>
-                  <p className="text-xs text-muted-foreground leading-relaxed">{fileState.file ? "I have analyzed and indexed your document. Choose a starter prompt below or ask your own question." : "Upload a PDF document to begin querying with direct citations."}</p>
+                  <h2 className="text-lg font-semibold text-foreground">
+                     {fileState.status === "complete" && fileState.file
+                        ? `Ask about ${fileState.file.name}`
+                        : fileState.status === "selected" && fileState.file
+                        ? `Ready to submit: ${fileState.file.name}`
+                        : "Grounded PDF Assistant"}
+                  </h2>
+                  <p className="text-xs text-muted-foreground leading-relaxed">
+                     {fileState.status === "complete"
+                        ? "I have analyzed and indexed your document. Choose a starter prompt below or ask your own question."
+                        : fileState.status === "selected"
+                        ? "Document selected! Click 'Submit Document' in the left panel to index and begin chatting."
+                        : fileState.status === "uploading"
+                        ? "Indexing document text and vector embeddings..."
+                        : "Upload a PDF document to begin querying with direct citations."}
+                  </p>
                </div>
 
                {!fileState.file && onUploadClick && (
@@ -48,8 +62,8 @@ export function ChatMessagesFeed({ messages, fileState, onStarterPromptClick, on
                      <button
                         key={idx}
                         onClick={() => onStarterPromptClick(prompt.query)}
-                        disabled={!fileState.file}
-                        className="w-full group p-3 rounded-xl border border-border/70 dark:border-white/10 hover:border-primary/50 dark:hover:border-primary/50 bg-muted/20 dark:bg-zinc-900/40 hover:bg-muted/40 dark:hover:bg-zinc-900/70 transition-all flex items-center justify-between text-left disabled:opacity-50 disabled:pointer-events-none"
+                        disabled={fileState.status !== "complete"}
+                        className="w-full group p-3 rounded-xl border border-border/70 dark:border-white/10 hover:border-primary/50 dark:hover:border-primary/50 bg-muted/20 dark:bg-zinc-900/40 hover:bg-muted/40 dark:hover:bg-zinc-900/70 transition-all flex items-center justify-between text-left disabled:opacity-50 disabled:pointer-events-none cursor-pointer"
                      >
                         <div className="flex items-center gap-3">
                            <div className="h-8 w-8 rounded-lg bg-background dark:bg-zinc-950 border border-border/80 dark:border-white/10 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">{prompt.icon}</div>
