@@ -40,8 +40,12 @@ class ChatService:
 			| StrOutputParser()
 		)
 
-		async for chunk in rag_chain.astream(question):
-			if chunk:
-				yield chunk
+		try:
+			async for chunk in rag_chain.astream(question):
+				if chunk:
+					yield chunk
+		except Exception as exc:
+			logger.exception(f"Error streaming RAG response for doc_id '{doc_id}':")
+			yield f"\n[Error streaming response: {str(exc)}]"
 
 chat_service = ChatService()

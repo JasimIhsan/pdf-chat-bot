@@ -29,7 +29,7 @@ class VectorService:
 			logger.info(f"Pinecone Vector Store initialized with index: {settings.PINECONE_INDEX_NAME}")
 
 		except Exception as exc:
-			logger.error(f"Failed to initialize Vector Store: {str(exc)}")
+			logger.exception("Failed to initialize Vector Store:")
 			raise HTTPException(
 				status_code=status.HTTP_502_BAD_GATEWAY,
 				detail=f"Vector Store initialization failed: {str(exc)}"
@@ -53,6 +53,7 @@ class VectorService:
 			self.store.add_documents(chunks)
 			logger.info(f"Successfully upserted {len(chunks)} chunks to Pinecone.")
 		except Exception as exc:
+			logger.exception("Failed to upsert vectors to Pinecone:")
 			raise HTTPException(
 				status_code=status.HTTP_502_BAD_GATEWAY,
 				detail=f"Failed to upsert vectors: {str(exc)}"

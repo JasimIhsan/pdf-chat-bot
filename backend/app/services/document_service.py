@@ -31,6 +31,7 @@ class DocumentService:
 			
 			return extracted_text, len(reader.pages)
 		except Exception as exc:
+			logger.exception(f"Failed to process PDF file:")
 			raise HTTPException(
 				status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
 				detail=f"Could not process the PDF file. It might be corrupted: {str(exc)}"
