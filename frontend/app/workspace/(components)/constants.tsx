@@ -2,13 +2,13 @@ import type { AgentActivityItem } from "@/components/agents/agent-activity/types
 import { BarChart3, FileCheck, FileText, Layers, Search, Sparkles } from "lucide-react";
 import type { StarterPrompt, TemplateQuestion } from "./types";
 
-const rawApiBase = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000/api/v1";
+const rawApiBase = "https://nonindividualistic-dilutely-glory.ngrok-free.dev/api/v1";
 export const API_BASE_URL = rawApiBase.endsWith("/api/v1") ? rawApiBase.replace(/\/$/, "") : `${rawApiBase.replace(/\/$/, "")}/api/v1`;
 
 export const MOCK_ACTIVITY: AgentActivityItem[] = [
-   { id: "1", type: "step", status: "complete", label: "Extracting text from PDF" },
-   { id: "2", type: "step", status: "complete", label: "Semantic document chunking" },
-   { id: "3", type: "step", status: "active", label: "Generating high-dimensional embeddings" },
+   { id: "1", type: "step", status: "pending", label: "Extracting text from PDF" },
+   { id: "2", type: "step", status: "pending", label: "Semantic document chunking" },
+   { id: "3", type: "step", status: "pending", label: "Generating high-dimensional embeddings" },
    { id: "4", type: "step", status: "pending", label: "Indexing in vector space" },
 ];
 

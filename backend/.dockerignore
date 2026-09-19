@@ -37,7 +37,6 @@ docs/
 *.log
 
 # Docker & OS artifacts
-Dockerfile*
 .dockerignore
 docker-compose*.yml
 .DS_Store

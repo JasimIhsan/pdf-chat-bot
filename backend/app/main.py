@@ -1,27 +1,19 @@
-import os
-import certifi
 from fastapi import FastAPI, Request, status
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
-from mangum import Mangum
 
 from app.api.router import api_router
 from app.core.config import settings
 from app.core.logging import logger
 from app.services.vector_service import vector_service
 
-# Ensure gRPC and HTTP client libraries can locate SSL CA root certificates in AWS Lambda
-os.environ.setdefault("GRPC_DEFAULT_SSL_ROOTS_FILE_PATH", certifi.where())
-os.environ.setdefault("SSL_CERT_FILE", certifi.where())
-os.environ.setdefault("TIKTOKEN_CACHE_DIR", "/tmp")
-
-# Run one-time initialization during container boot
+# Run one-time initialization during application startup
 try:
 	logger.info("Initializing vector service...")
 	vector_service.initialize()
 	logger.info(f"{settings.PROJECT_NAME} initialized.")
 except Exception as e:
-	logger.exception("Failed to initialize services during container boot:")
+	logger.exception("Failed to initialize vector service on startup:")
 
 app = FastAPI(
 	title=settings.PROJECT_NAME,
@@ -69,6 +61,3 @@ def root():
 		"docs_url": "/docs",
 		"api_v1": settings.API_V1_STR,
 	}
-
-# Handler with lifespan explicitly disabled for Lambda performance
-handler = Mangum(app, lifespan="off")

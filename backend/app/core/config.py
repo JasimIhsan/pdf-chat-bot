@@ -7,8 +7,8 @@ class Settings(BaseSettings):
 	API_V1_STR: str = "/api/v1"
 
 	# API Keys & Cloud Configuration
-	GEMINI_API_KEY: str
-	PINECONE_API_KEY: str
+	GEMINI_API_KEY: str = "mock-gemini-key"
+	PINECONE_API_KEY: str = "mock-pinecone-key"
 	PINECONE_INDEX_NAME: str = "pdf-chatbot"
 
 	# Models and LLMs
@@ -23,6 +23,7 @@ class Settings(BaseSettings):
 
 	# Environment & Security
 	ENVIRONMENT: str = "development"
+	IS_MOCK: bool = True  # Set to False to enable real Gemini and Pinecone calls
 	CORS_ORIGINS: List[str] = [
 		"https://pdfchatbot.jasimihsan.in",
 		"http://localhost:3000",

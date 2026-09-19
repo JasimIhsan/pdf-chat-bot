@@ -13,6 +13,10 @@ class VectorService:
 		self._vector_store: Optional[PineconeVectorStore]= None
 
 	def initialize(self) -> None:
+		if settings.IS_MOCK:
+			logger.info("MOCK MODE active: Skipping Pinecone initialization.")
+			return
+
 		# Initialize the Pinecone index connection and Gemini embeddings.
 		try:
 			embedding = GoogleGenerativeAIEmbeddings(
@@ -49,6 +53,10 @@ class VectorService:
 		return self._vector_store
 
 	async def add_documents(self, chunks: List[Document]) -> None:
+		if settings.IS_MOCK:
+			logger.info(f"MOCK MODE active: Skipped upserting {len(chunks)} chunks to Pinecone.")
+			return
+
 		try:
 			self.store.add_documents(chunks)
 			logger.info(f"Successfully upserted {len(chunks)} chunks to Pinecone.")

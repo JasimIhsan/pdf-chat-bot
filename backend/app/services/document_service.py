@@ -54,7 +54,24 @@ class DocumentService:
 		return contents
 
 	async def process_pdf(self, pdf_bytes: bytes, filename: str) -> Tuple[str, List[Document], int, int]:
-		# Offload synchronous CPU parsing to threadpool to avoid blocking async event loop
+		if settings.IS_MOCK:
+			doc_id = str(uuid.uuid4())
+			mock_text = f"Mock document content for {filename}. Key revenue growth was 28% YoY driven by enterprise cloud services."
+			
+			mock_chunks = [
+				Document(
+					page_content=mock_text,
+					metadata={"doc_id": doc_id, "filename": filename, "page": 1}
+				)
+			]
+			
+			total_pages = 3
+			total_chars = len(mock_text)
+			
+			logger.info(f"[TEMPORARY MOCK] Returned mock PDF processing result for '{filename}' (doc_id: {doc_id}).")
+			return doc_id, mock_chunks, total_pages, total_chars
+
+		# Real processing when MOCK_MODE = False
 		extracted_text, total_pages = await run_in_threadpool(
 			self._extract_text_and_pages_sync, pdf_bytes
 		)

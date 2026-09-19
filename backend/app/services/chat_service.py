@@ -30,6 +30,19 @@ class ChatService:
 	async def stream_rag_chat(self, doc_id: str, question: str) -> AsyncIterable[str]:
 		logger.info(f"Streaming RAG query for doc_id '{doc_id}': '{question[:50]}...'")
 
+		if settings.IS_MOCK:
+			import asyncio
+			mock_response = (
+				f"Based on the uploaded document (Doc ID: {doc_id[:8]}), here is the simulated response to your question: "
+				f"\"{question}\". The document highlights a 28% YoY increase in revenue driven by Enterprise Cloud expansion ($4.2M) "
+				f"and automated subscription renewals. Key milestones were achieved in Q3 with 99.9% vector retrieval precision."
+			)
+			words = mock_response.split(" ")
+			for i, word in enumerate(words):
+				yield word + (" " if i < len(words) - 1 else "")
+				await asyncio.sleep(0.04)
+			return
+
 		retriever = vector_service.get_retriever(doc_id=doc_id, k=4)
 		llm = self._get_llm()
 

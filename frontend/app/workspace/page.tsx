@@ -1,7 +1,8 @@
 "use client";
 
 import { Navbar } from "@/app/(componets)/Navbar";
-import { useRef, useState } from "react";
+import { AlertTriangle, MessageCircle, X } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { API_BASE_URL, ChatHeader, ChatInputArea, ChatMessagesFeed, DocumentSidebar, type ChatMessage, type DocumentMetadata, type DocumentState, type LeftTab, type MobileView } from "./(components)";
 
@@ -22,6 +23,36 @@ export default function WorkspacePage() {
    const [isSidebarOpen, setIsSidebarOpen] = useState(true);
    const [messages, setMessages] = useState<ChatMessage[]>([]);
    const [isSending, setIsSending] = useState(false);
+   const [isServerDown, setIsServerDown] = useState(false);
+   const [showBanner, setShowBanner] = useState(true);
+
+   const checkServerHealth = async (): Promise<boolean> => {
+      try {
+         const res = await fetch(`${API_BASE_URL}/health`, {
+            method: "GET",
+            headers: {
+               "ngrok-skip-browser-warning": "true",
+            },
+         });
+         if (!res.ok) {
+            setIsServerDown(true);
+            return false;
+         }
+         const data = await res.json().catch(() => null);
+         // Ensure status is UP and service explicitly matches PDF Chat API to avoid ngrok collision with other dev apps
+         const isHealthy = data?.status === "UP" && Boolean(data?.service?.includes("PDF Chat API"));
+         setIsServerDown(!isHealthy);
+         return isHealthy;
+      } catch (err) {
+         console.error("Health check failed:", err);
+         setIsServerDown(true);
+         return false;
+      }
+   };
+
+   useEffect(() => {
+      checkServerHealth();
+   }, []);
 
    const handleFileSelect = (selectedFile: File) => {
       const url = URL.createObjectURL(selectedFile);
@@ -50,11 +81,30 @@ export default function WorkspacePage() {
    const handleSubmitDocument = async () => {
       if (!fileState.file || fileState.status === "uploading") return;
 
+      // Re-verify backend health & service matching before attempting upload
+      const isHealthy = await checkServerHealth();
+      if (!isHealthy) {
+         toast.error("Service Unavailable", {
+            description: "The backend server is offline or running a different development service.",
+         });
+         return;
+      }
+
       const selectedFile = fileState.file;
       const currentPreviewUrl = fileState.previewUrl || URL.createObjectURL(selectedFile);
       setFileState((prev) => ({ ...prev, status: "uploading" }));
 
+      // Show toast if uploading & indexing takes longer than 4 seconds
+      const slowLoadingToastId = setTimeout(() => {
+         toast.loading("Processing large PDF...", {
+            id: "slow-upload-toast",
+            description: "Chunking and vectorizing document embeddings. Please wait a moment.",
+         });
+      }, 4000);
+
       try {
+         const startTime = Date.now();
+
          const formData = new FormData();
          formData.append("file", selectedFile);
 
@@ -63,12 +113,25 @@ export default function WorkspacePage() {
             body: formData,
          });
 
+         clearTimeout(slowLoadingToastId);
+         toast.dismiss("slow-upload-toast");
+
          if (!response.ok) {
             const errData = await response.json().catch(() => null);
             throw new Error(errData?.detail || `Upload failed with status ${response.status}`);
          }
 
          const data: DocumentMetadata = await response.json();
+
+         // Ensure all 4 step animations complete sequentially (approx 4.8s min total)
+         const elapsedTime = Date.now() - startTime;
+         const targetAnimTime = 4800;
+         if (elapsedTime < targetAnimTime) {
+            await new Promise((resolve) => setTimeout(resolve, targetAnimTime - elapsedTime));
+         }
+
+         // Brief pause to display 100% full completion checkmarks before switching state
+         await new Promise((resolve) => setTimeout(resolve, 600));
 
          setFileState({
             file: selectedFile,
@@ -84,9 +147,11 @@ export default function WorkspacePage() {
             description: `${selectedFile.name} indexed successfully (${data.total_chunks} chunks).`,
          });
       } catch (err: any) {
+         clearTimeout(slowLoadingToastId);
+         toast.dismiss("slow-upload-toast");
          console.error("Failed to upload document:", err);
-         toast.error("Upload Failed", {
-            description: err?.message || "Could not connect to backend server at " + API_BASE_URL + ". Please ensure your backend is running.",
+         toast.error("Service Unavailable", {
+            description: "Our service is not on now. Please try again later.",
          });
          // Keep file selected so the user can easily retry submission without choosing the file again
          setFileState((prev) => ({
@@ -165,10 +230,6 @@ export default function WorkspacePage() {
          from: "assistant",
          content: "",
          thinking: true,
-         activity: [
-            { id: "a1", type: "step", status: "complete", label: "Semantic similarity search" },
-            { id: "a2", type: "step", status: "active", label: "Grounded context synthesis" },
-         ],
       };
 
       setMessages((prev) => [...prev, assistantInitial]);
@@ -220,10 +281,6 @@ export default function WorkspacePage() {
                              thinking: false,
                              isStreaming: true,
                              content: accumulatedContent,
-                             activity: [
-                                { id: "a1", type: "step", status: "complete", label: "Semantic vector retrieval" },
-                                { id: "a2", type: "step", status: "complete", label: "Grounded synthesis stream" },
-                             ],
                           }
                         : m
                   )
@@ -287,6 +344,32 @@ export default function WorkspacePage() {
          {/* Top Navbar matching Home page */}
          <Navbar />
 
+         {/* Removable Server Down Hobby Notice Banner */}
+         {isServerDown && showBanner && (
+            <div className="w-full bg-linear-to-r from-amber-500/15 via-orange-500/10 to-amber-500/15 border-b border-amber-500/25 text-amber-200 px-4 py-2.5 text-xs sm:text-sm flex items-center justify-between gap-3 backdrop-blur-xl transition-all shadow-lg shadow-black/10">
+               <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0 flex-wrap sm:flex-nowrap">
+                  <div className="flex items-center gap-2 min-w-0">
+                     <span className="flex h-2 w-2 rounded-full bg-amber-400 animate-ping shrink-0" />
+                     <AlertTriangle className="h-4 w-4 text-amber-400 shrink-0" />
+                     <p className="font-medium text-amber-100/90 truncate">
+                        <span className="font-semibold text-amber-300">Hobby Project Notice:</span> The backend server is currently sleeping. Message me on WhatsApp to spin it up!
+                     </p>
+                  </div>
+                  <a
+                     href="https://wa.me/919656646449?text=Hi%2C%20I%27m%20exploring%20your%20PDF%20Chatbot%20app!%20Could%20you%20please%20start%20the%20backend%20server%3F"
+                     target="_blank"
+                     rel="noopener noreferrer"
+                     className="inline-flex items-center gap-1.5 font-semibold text-emerald-300 hover:text-emerald-200 bg-emerald-500/20 hover:bg-emerald-500/30 text-xs px-3 py-1 rounded-full border border-emerald-500/30 transition-all shrink-0 shadow-sm"
+                  >
+                     <MessageCircle className="h-3.5 w-3.5 fill-emerald-400/20 text-emerald-400" /> WhatsApp Me (+91 96566 46449)
+                  </a>
+               </div>
+               <button onClick={() => setShowBanner(false)} className="p-1 rounded-lg text-amber-300/80 hover:text-white hover:bg-amber-500/20 transition-colors shrink-0" aria-label="Close banner">
+                  <X className="h-4 w-4" />
+               </button>
+            </div>
+         )}
+
          {/* Main Workspace Container with responsive padding and heights */}
          <div className="container mx-auto px-2 sm:px-4 md:px-8 max-w-screen-2xl flex-1 flex min-h-0 py-2 sm:py-3 md:py-4 gap-2 sm:gap-3 md:gap-3.5 overflow-hidden">
             {/* Hidden File Input */}
@@ -308,6 +391,7 @@ export default function WorkspacePage() {
                onRemoveFile={handleRemoveFile}
                mobileView={mobileView}
                setMobileView={setMobileView}
+               isServerDown={isServerDown}
             />
 
             {/* Right Panel (Chatting Interface) - In mobile view shows after upload or when selected */}

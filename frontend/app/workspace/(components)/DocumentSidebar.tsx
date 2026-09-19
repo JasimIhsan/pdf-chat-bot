@@ -2,8 +2,8 @@
 
 import { ActivityRow } from "@/components/agents/agent-activity/activity-row";
 import { Tooltip } from "@/components/motion/tooltip";
-import { ArrowRight, BarChart3, CheckCircle2, ChevronDown, Database, FileCheck, FileText, Hash, Layers, MessageSquare, PanelLeftClose, RefreshCw, ShieldCheck, Trash2, Type, UploadCloud, Zap } from "lucide-react";
-import type { RefObject } from "react";
+import { ArrowRight, BarChart3, CheckCircle2, ChevronDown, Database, FileCheck, FileText, Hash, Layers, LoaderCircle, MessageSquare, PanelLeftClose, RefreshCw, ShieldCheck, Trash2, Type, UploadCloud, Zap } from "lucide-react";
+import { useEffect, useState, type RefObject } from "react";
 import { MOCK_ACTIVITY, MOCK_CHUNKS } from "./constants";
 import type { DocumentState, LeftTab, MobileView } from "./types";
 
@@ -22,9 +22,44 @@ interface DocumentSidebarProps {
    onRemoveFile?: () => void;
    mobileView?: MobileView;
    setMobileView?: (view: MobileView) => void;
+   isServerDown?: boolean;
 }
 
-export function DocumentSidebar({ isOpen, onClose, fileState, activeTab, setActiveTab, isDragging, fileInputRef, onDragOver, onDragLeave, onDrop, onSubmitDocument, onRemoveFile, mobileView, setMobileView }: DocumentSidebarProps) {
+export function DocumentSidebar({ isOpen, onClose, fileState, activeTab, setActiveTab, isDragging, fileInputRef, onDragOver, onDragLeave, onDrop, onSubmitDocument, onRemoveFile, mobileView, setMobileView, isServerDown }: DocumentSidebarProps) {
+   const [activeStepIndex, setActiveStepIndex] = useState(0);
+
+   useEffect(() => {
+      if (fileState.status !== "uploading") {
+         setActiveStepIndex(0);
+         return;
+      }
+
+      setActiveStepIndex(0);
+      const interval = setInterval(() => {
+         setActiveStepIndex((prev) => {
+            if (prev < MOCK_ACTIVITY.length) {
+               return prev + 1;
+            }
+            return prev;
+         });
+      }, 1100);
+
+      return () => clearInterval(interval);
+   }, [fileState.status]);
+
+   const dynamicActivity = MOCK_ACTIVITY.map((item, index) => {
+      if (index < activeStepIndex) {
+         return { ...item, status: "complete" as const };
+      } else if (index === activeStepIndex) {
+         return { ...item, status: "active" as const };
+      } else {
+         return { ...item, status: "pending" as const };
+      }
+   });
+
+   const isAllComplete = activeStepIndex >= MOCK_ACTIVITY.length;
+   const progressPercent = isAllComplete ? 100 : Math.min(95, Math.round(((activeStepIndex + 0.4) / MOCK_ACTIVITY.length) * 100));
+
    const formatFileSize = (bytes: number) => {
       if (bytes < 1024 * 1024) {
          return `${(bytes / 1024).toFixed(1)} KB`;
@@ -107,7 +142,7 @@ export function DocumentSidebar({ isOpen, onClose, fileState, activeTab, setActi
                         <h3 className="text-sm sm:text-base font-semibold text-foreground mb-1 text-center">Upload PDF Document</h3>
                         <p className="text-xs text-muted-foreground text-center mb-3 sm:mb-4">Drag and drop your file here, or click to browse</p>
                         <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap justify-center">
-                           <span className="text-[10px] sm:text-[11px] font-medium bg-background dark:bg-zinc-950 px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full border border-border/80 dark:border-white/10 text-muted-foreground">PDF up to 25MB</span>
+                           <span className="text-[10px] sm:text-[11px] font-medium bg-background dark:bg-zinc-950 px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full border border-border/80 dark:border-white/10 text-muted-foreground">PDF up to 10MB</span>
                            <span className="text-[10px] sm:text-[11px] font-medium bg-background dark:bg-zinc-950 px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full border border-border/80 dark:border-white/10 text-muted-foreground">Auto-Chunking</span>
                         </div>
                      </div>
@@ -190,10 +225,18 @@ export function DocumentSidebar({ isOpen, onClose, fileState, activeTab, setActi
 
                   {/* Submit and Action Buttons */}
                   <div className="pt-4 border-t border-border/60 flex flex-col sm:flex-row gap-2.5">
-                     <button onClick={onSubmitDocument} className="flex-1 h-11 px-4 rounded-xl bg-primary text-primary-foreground font-semibold text-sm flex items-center justify-center gap-2 shadow-sm hover:bg-primary/90 active:scale-[0.99] transition-all cursor-pointer">
+                     <button
+                        onClick={onSubmitDocument}
+                        disabled={isServerDown}
+                        className={`flex-1 h-11 px-4 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 shadow-sm transition-all ${
+                           isServerDown
+                              ? "bg-muted text-muted-foreground opacity-70 cursor-not-allowed border border-amber-500/30"
+                              : "bg-primary text-primary-foreground hover:bg-primary/90 active:scale-[0.99] cursor-pointer"
+                        }`}
+                     >
                         <UploadCloud className="h-4 w-4" />
-                        <span>Submit Document</span>
-                        <ArrowRight className="h-4 w-4 ml-0.5" />
+                        <span>{isServerDown ? "Backend Offline / Mismatched" : "Submit Document"}</span>
+                        {!isServerDown && <ArrowRight className="h-4 w-4 ml-0.5" />}
                      </button>
                      <button onClick={() => fileInputRef.current?.click()} className="h-11 px-4 rounded-xl border border-border/80 bg-muted/40 hover:bg-muted text-muted-foreground hover:text-foreground font-medium text-xs transition-colors cursor-pointer">
                         Change File
@@ -204,21 +247,38 @@ export function DocumentSidebar({ isOpen, onClose, fileState, activeTab, setActi
 
             {/* 3. Uploading / Indexing State */}
             {fileState.status === "uploading" && (
-               <div className="flex-1 p-8 flex flex-col justify-center items-center">
+               <div className="flex-1 p-6 sm:p-8 flex flex-col justify-center items-center">
                   <div className="max-w-md w-full space-y-6">
-                     <div className="text-center space-y-2">
-                        <div className="h-12 w-12 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto border border-primary/20 animate-pulse">
-                           <Database className="h-6 w-6 text-primary" />
+                     <div className="text-center space-y-3">
+                        <div className="h-14 w-14 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto border border-primary/20 shadow-md">
+                           <LoaderCircle className="h-7 w-7 text-primary animate-spin" />
                         </div>
-                        <h3 className="text-base font-semibold">Indexing Document</h3>
-                        <p className="text-xs text-muted-foreground truncate">{fileState.file?.name}</p>
+                        <div className="space-y-1">
+                           <h3 className="text-base font-semibold text-foreground">Processing & Indexing PDF</h3>
+                           <p className="text-xs text-muted-foreground truncate max-w-xs mx-auto">{fileState.file?.name}</p>
+                        </div>
+
+                        {/* Animated progress indicator bar */}
+                        <div className="w-full space-y-1.5 pt-1">
+                           <div className="flex justify-between items-center text-xs text-muted-foreground font-mono px-0.5">
+                              <span>
+                                 Step {Math.min(activeStepIndex + 1, MOCK_ACTIVITY.length)} of {MOCK_ACTIVITY.length}
+                              </span>
+                              <span className="font-semibold text-primary">{progressPercent}%</span>
+                           </div>
+                           <div className="w-full bg-muted/50 rounded-full h-2 overflow-hidden border border-border/50 p-0.5 shadow-2xs">
+                              <div className="bg-linear-to-r from-primary via-indigo-500 to-emerald-400 h-full rounded-full transition-all duration-500 ease-out" style={{ width: `${progressPercent}%` }} />
+                           </div>
+                        </div>
                      </div>
 
-                     <div className="space-y-3 bg-muted/20 dark:bg-zinc-900/40 p-5 rounded-xl border border-border/60 dark:border-white/10">
-                        {MOCK_ACTIVITY.map((item, i) => (
-                           <ActivityRow key={i} item={item} />
+                     <div className="space-y-2 bg-muted/20 dark:bg-zinc-900/40 p-4 sm:p-5 rounded-xl border border-border/60 dark:border-white/10 shadow-xs">
+                        {dynamicActivity.map((item, i) => (
+                           <ActivityRow key={item.id || i} item={item} />
                         ))}
                      </div>
+
+                     <p className="text-[11px] text-center text-muted-foreground/80 bg-muted/30 p-2.5 rounded-lg border border-border/40">⏳ Large files or cold backend start can take a few extra seconds. Thanks for your patience!</p>
                   </div>
                </div>
             )}

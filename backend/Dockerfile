@@ -1,19 +1,24 @@
-# Stage 1: Official AWS Lambda Python 3.12 base image
-FROM public.ecr.aws/lambda/python:3.12
+# Production Dockerfile optimized for GCP Cloud Run & Container environments
+FROM python:3.12-slim
 
-# Set pip optimization environment variables
+# Set environment variables for Python performance & unbuffered logging
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
     PIP_NO_CACHE_DIR=1 \
-    PIP_DISABLE_PIP_VERSION_CHECK=1
+    PIP_DISABLE_PIP_VERSION_CHECK=1 \
+    PORT=8080
 
-# Install dependencies in a separate layer for optimal Docker caching
-COPY requirements.txt ${LAMBDA_TASK_ROOT}/
-RUN pip install -r ${LAMBDA_TASK_ROOT}/requirements.txt
+WORKDIR /backend
 
-# Copy application code into Lambda task root
-# This preserves the `app` directory structure so imports like `from app.core.config import settings` work seamlessly
-COPY app/ ${LAMBDA_TASK_ROOT}/app/
+# Copy and install dependencies
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Set CMD to point directly to the Mangum handler in app/main.py
-CMD ["app.main.handler"]
+# Copy application source code
+COPY app/ ./app/
+
+# Expose default GCP Cloud Run port
+EXPOSE 8080
+
+# Launch Uvicorn server tuned for GCP Cloud Run
+CMD ["sh", "-c", "exec uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8080} --workers 2"]

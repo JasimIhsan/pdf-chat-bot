@@ -21,6 +21,11 @@ import { Toaster } from "@/components/ui/sonner";
 export const metadata: Metadata = {
    title: "PDFChat - Chat with any PDF",
    description: "AI-powered RAG PDF Chatbot application",
+   icons: {
+      icon: [{ url: "/favicon.ico" }, { url: "/favicon.jpg", type: "image/jpeg" }],
+      shortcut: "/favicon.ico",
+      apple: "/logo.jpg",
+   },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

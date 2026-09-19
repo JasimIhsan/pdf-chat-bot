@@ -2,7 +2,6 @@
 
 import { ActivityRow } from "@/components/agents/agent-activity/activity-row";
 import { AgentDisclosure } from "@/components/agents/agent-disclosure";
-import { Citations } from "@/components/agents/citations";
 import { ThinkingShimmer } from "@/components/agents/loading-states/thinking-shimmer";
 import { Message, MessageAvatar, MessageBubble, MessageBubbleContent, MessageContent } from "@/components/agents/message";
 import { MessageScroller } from "@/components/agents/message-scroller";
@@ -29,21 +28,15 @@ export function ChatMessagesFeed({ messages, fileState, onStarterPromptClick, on
                   <div className="h-12 w-12 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto border border-primary/20 shadow-xs">
                      <Sparkles className="h-6 w-6 text-primary" />
                   </div>
-                  <h2 className="text-lg font-semibold text-foreground">
-                     {fileState.status === "complete" && fileState.file
-                        ? `Ask about ${fileState.file.name}`
-                        : fileState.status === "selected" && fileState.file
-                        ? `Ready to submit: ${fileState.file.name}`
-                        : "Grounded PDF Assistant"}
-                  </h2>
+                  <h2 className="text-lg font-semibold text-foreground">{fileState.status === "complete" && fileState.file ? `Ask about ${fileState.file.name}` : fileState.status === "selected" && fileState.file ? `Ready to submit: ${fileState.file.name}` : "Grounded PDF Assistant"}</h2>
                   <p className="text-xs text-muted-foreground leading-relaxed">
                      {fileState.status === "complete"
                         ? "I have analyzed and indexed your document. Choose a starter prompt below or ask your own question."
                         : fileState.status === "selected"
-                        ? "Document selected! Click 'Submit Document' in the left panel to index and begin chatting."
-                        : fileState.status === "uploading"
-                        ? "Indexing document text and vector embeddings..."
-                        : "Upload a PDF document to begin querying with direct citations."}
+                          ? "Document selected! Click 'Submit Document' in the left panel to index and begin chatting."
+                          : fileState.status === "uploading"
+                            ? "Indexing document text and vector embeddings..."
+                            : "Upload a PDF document to begin querying with direct citations."}
                   </p>
                </div>
 
@@ -114,10 +107,10 @@ export function ChatMessagesFeed({ messages, fileState, onStarterPromptClick, on
                      ) : (
                         <MessageBubble variant={msg.from === "user" ? "solid" : "soft"}>
                            <MessageBubbleContent
-                              className={msg.from === "user" ? "bg-primary text-primary-foreground font-medium text-xs sm:text-sm px-3 py-2 sm:px-3.5 sm:py-2.5 max-w-[92%] sm:max-w-[82%]" : "prose dark:prose-invert max-w-[95%] sm:max-w-[85%] text-xs sm:text-sm leading-relaxed px-3 py-2.5 sm:px-3.5 sm:py-2.5 break-words overflow-hidden"}
+                              className={msg.from === "user" ? "bg-primary text-primary-foreground font-medium text-xs sm:text-sm px-3 py-2 sm:px-3.5 sm:py-2.5 max-w-[92%] sm:max-w-[82%]" : "prose dark:prose-invert max-w-[95%] sm:max-w-[85%] text-xs sm:text-sm leading-relaxed px-3 py-2.5 sm:px-3.5 sm:py-2.5 wrap-break-word overflow-hidden"}
                            >
                               {msg.from === "user" ? (
-                                 <div className="whitespace-pre-wrap break-words">{msg.content}</div>
+                                 <div className="whitespace-pre-wrap wrap-break-word">{msg.content}</div>
                               ) : (
                                  <StreamingResponse status={msg.isStreaming ? "streaming" : "complete"}>
                                     <ReactMarkdown
@@ -155,18 +148,7 @@ export function ChatMessagesFeed({ messages, fileState, onStarterPromptClick, on
                         </MessageBubble>
                      )}
 
-                     {msg.citations && (
-                        <div className="mt-2 flex gap-2 flex-wrap">
-                           <Citations
-                              citations={msg.citations.map((c) => ({
-                                 id: c.id,
-                                 title: c.title,
-                                 domain: c.content,
-                              }))}
-                           />
-                        </div>
-                     )}
-                  </MessageContent>
+                   </MessageContent>
                </Message>
             ))}
          </div>
